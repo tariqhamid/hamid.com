@@ -5,12 +5,12 @@ p=Path(__file__).resolve().parent;a=np.asarray(Image.open(p/'bird-bodies.png').c
 for i,(bx,by,w,h) in enumerate(boxes):
  s=min(100/w,100/h);ox=(100-w*s)/2;oy=(100-h*s)/2
  def pixel(x,y):return a[min(a.shape[0]-1,max(0,round(by+(y-oy)/s))),min(a.shape[1]-1,max(0,round(bx+(x-ox)/s)))]
- ys=[y for y in np.arange(20,82,.5) if pixel(50,y)[3]>220];top=min(ys);bottom=max(ys);target=top+(bottom-top)*.18
+ ys=[y for y in np.arange(20,82,.5) if pixel(56,y)[3]>220];top=min(ys);bottom=max(ys);target=top+(bottom-top)*(.38 if i==12 else .12)
  choices=[]
- for x in range(46,55):
-  for y in np.arange(top+3,bottom-3,.5):
-   coverage=np.mean([pixel(x+dx,y+dy)[3]>220 for dx in range(-6,7) for dy in range(-3,4)])
-   if coverage>=.98:choices.append(((x-50)**2+(y-target)**2,x,float(y)))
+ for x in range(52,61):
+  for y in np.arange(top+2,bottom-2,.5):
+   coverage=np.mean([pixel(x+dx,y+dy)[3]>220 for dx in range(-4,5) for dy in range(-2,3)])
+   if coverage>=.98:choices.append(((x-56)**2+(y-target)**2,x,float(y)))
  _,x,y=min(choices)
  if i==0:x,y=46,57
  assert all(pixel(x+dx,y+dy)[3]>220 for dx in range(-4,5) for dy in range(-2,3)),i
