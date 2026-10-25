@@ -1,0 +1,45 @@
+import {rigDefs,rigBird,flightCss} from './flight-objects.mjs';
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+const dir=fileURLToPath(new URL('./',import.meta.url));
+const png=readFileSync(dir+'realistic-bird-atlas.png');
+const width=png.readUInt32BE(16),height=png.readUInt32BE(20);
+const lapwing=readFileSync(dir+'lapwing.png');
+const lw=lapwing.readUInt32BE(16),lh=lapwing.readUInt32BE(20);
+const cw=width/5,ch=height/6;
+const boxes=[[30,28,241,190],[279,21,221,197],[498,27,243,195],[748,31,256,199],[1034,29,210,194],[24,230,216,201],[263,230,240,210],[528,229,216,205],[746,234,269,208],[1031,230,214,208],[19,448,229,192],[268,448,226,191],[529,448,231,193],[773,449,235,194],[1010,442,236,201],[25,651,220,185],[263,646,251,180],[523,647,243,195],[738,648,266,196],[1010,648,239,194],[12,846,251,188],[263,838,247,206],[519,840,234,201],[758,847,251,191],[1021,847,225,192],[13,1042,256,198],[281,1050,216,183],[519,1050,218,184],[735,1044,258,192],[1009,1045,239,190]];
+const atlasBox=i=>boxes[i].map((v,j)=>+(v*(j%2===0?width:height)/1254).toFixed(2)).join(' ');
+const names=['Hoopoe','Nightingale','Parakeet','Peacock','Mallard','Partridge','Bearded vulture','Falcon','Heron','Eagle owl','Sparrow','Goldfinch','Kingfisher','Dove','Swallow','Robin','Stork','Demoiselle crane','Magpie','Raven','Golden oriole','Bee-eater','Roller','Wagtail','Blackbird','Pheasant','Quail','Skylark','Lapwing','Teal'];
+const box=i=>i===28?`0 0 ${lw} ${lh}`:atlasBox(i);
+const birdUse=i=>i===28?'<use href="#lapwing-art"/>':`<use href="#realistic-atlas" clip-path="url(#crop-${i})"/>`;
+const targets=[[0,-113],[-14,-92],[14,-92],[0,-67],[-22,-49],[22,-49],[0,-21],[-34,-24],[34,-24],[-58,-47],[58,-47],[-83,-73],[83,-73],[-109,-100],[109,-100],[-135,-121],[135,-121],[-163,-137],[163,-137],[-190,-144],[190,-144],[-211,-135],[211,-135],[-175,-100],[175,-100],[-128,-63],[128,-63],[-25,18],[25,18]];
+function bird(i,size=76){return rigBird(i,size,names,box);}
+
+const original=dir+'conference-before-realistic.svg';
+if(!existsSync(original))writeFileSync(original,readFileSync(dir+'conference-of-the-birds.svg'));
+let svg=readFileSync(original,'utf8');
+const start=svg.indexOf('<g transform="translate(600 326)">'),end=svg.indexOf('<g fill="none" stroke="#d2ad70"',start);
+if(start<0||end<0)throw new Error('Cannot find flock section');
+const flock=targets.map(([tx,ty],i)=>{
+ const a=i*2*Math.PI/29,r=465+(i%3)*65;
+ const xy=offset=>`--x${offset===0?'':offset===.8?'2':'3'}:${(Math.cos(a+offset)*r).toFixed(1)}px;--y${offset===0?'':offset===.8?'2':'3'}:${(Math.sin(a+offset)*r*.55).toFixed(1)}px;`;
+ return `<g class="traveller" data-bird="${i+1}" style="${xy(0)}${xy(.8)}${xy(1.6)}--tx:${tx*2.3}px;--ty:${ty*1.8}px"><g class="float" style="animation-delay:${-i*.17}s">${bird(i+1,349)}</g></g>`;
+}).join('');
+const cropDefs=boxes.map((_,i)=>{const [x,y,w,h]=atlasBox(i).split(' ');return `<clipPath id="crop-${i}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`}).join('');
+const defs=`<defs>${rigDefs(names)}</defs>`;
+svg=svg.slice(0,start)+defs+`<g transform="translate(600 326)">${flock}</g><g transform="translate(600 333)" data-bird="0"><g class="float">${bird(0,488)}</g></g>`+svg.slice(end);
+svg=svg.replace('<circle cx="600" cy="326" r="255"','<ellipse cx="600" cy="326" rx="620" ry="355"').replace('<circle cx="600" cy="326" r="266"','<ellipse cx="600" cy="326" rx="640" ry="375"').replace('r="275" fill="url(#halo)"','r="435" fill="url(#halo)"');
+svg=svg.replace('viewBox="0 0 1200 720"','viewBox="-170 -150 1540 1010"').replace('M0 0h1200v720H0z','M-170-150h1540v1010H-170z');
+svg=svg.replace('</style>',flightCss+'</style>');
+svg=svg.replace(/<desc id="desc">.*?<\/desc>/s,'<desc id="desc">Thirty realistically illustrated birds: a hoopoe guides twenty-nine individually moving birds as they gather into the Simurgh. An artistic interpretation of Attar’s poem.</desc>');
+writeFileSync(dir+'conference-of-the-birds.svg',svg);
+const originalHtml=dir+'index-before-realistic.html';
+if(!existsSync(originalHtml))writeFileSync(originalHtml,readFileSync(dir+'index.html'));
+let html=readFileSync(originalHtml,'utf8').replace(/img\{/g,'#scene{').replace('height:100svh;object-fit:contain','height:auto;min-height:115svh;object-fit:contain');
+html=html.replace(/<img id="scene"[^>]*>/,svg.replace('<svg xmlns=', '<svg id="scene" xmlns='));
+html=html.replace('</style>',`.bird-gallery{max-width:1100px;margin:0 auto;padding:48px 28px 70px}.bird-gallery h2{font-weight:400;font-size:34px;margin:0 0 12px}.bird-gallery>p{letter-spacing:0;text-transform:none;font-size:14px;line-height:1.7;max-width:600px}.bird-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:32px 12px;margin-top:40px}.bird-grid figure{margin:0;text-align:center}.bird-grid svg{width:100%;height:auto;aspect-ratio:1;overflow:hidden}.bird-grid figcaption{font:12px system-ui;color:#d9c9aa}@media(max-width:650px){.bird-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.bird-gallery h2{font-size:28px}}</style>`);
+const gallery=`<section class="bird-gallery" aria-label="All thirty birds"><h2>The thirty birds</h2><p>A closer look at the assembly. These species are an artistic interpretation inspired by Attar’s poem.</p><div class="bird-grid">${names.map((name,i)=>`<figure><svg role="img" aria-label="${name}" viewBox="-50 -50 100 100">${rigBird(i,100,names,box)}</svg><figcaption>${String(i+1).padStart(2,'0')} · ${name}</figcaption></figure>`).join('')}</div></section>`;
+html=html.replace('</main>',`<div class="flight-controls" aria-label="Animation controls"><label><input type="checkbox" id="flight-pause"> Pause animation</label><label><input type="checkbox" id="flight-slow"> Slow motion</label></div></main>${gallery}`);
+html=html.replace('</html>',`<style>.flight-controls{position:absolute;right:5%;bottom:3%;z-index:2;display:flex;gap:8px}.flight-controls label{display:flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid #edce9544;border-radius:3px;font:12px system-ui;background:#0b242ee8;cursor:pointer}html:has(#flight-pause:checked) *{animation-play-state:paused!important}html:has(#flight-slow:checked){--motion-factor:3}html:has(#flight-slow:checked) .traveller{animation-duration:54s}html:has(#flight-slow:checked) .float{animation-duration:10.8s}</style></html>`);
+writeFileSync(dir+'index.html',html);
+console.log(JSON.stringify({atlas:{width,height},birds:30,animatedTravellers:29,svgBytes:Buffer.byteLength(svg),htmlBytes:Buffer.byteLength(html)}));
