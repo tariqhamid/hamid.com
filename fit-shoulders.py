@@ -14,6 +14,7 @@ for i,(bx,by,w,h) in enumerate(boxes):
  _,x,y=min(choices)
  if i==0:x,y=46,57
  if i in [12,4,21,29]:y+=3
+ if i in [2,3,14,23,24,25]:y-=3
  assert all(pixel(x+dx,y+dy)[3]>220 for dx in range(-4,5) for dy in range(-2,3)),i
  out.append([x,y]);rgb=pixel(x,y)[:3];colors.append('#'+''.join(f'{v:02x}' for v in rgb))
  print(i,old[i],'->',out[-1])
