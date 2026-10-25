@@ -12,10 +12,10 @@ const shoulderColors=JSON.parse(readFileSync(new URL('shoulder-colors.json',impo
 // Fit the root to each silhouette's upper torso instead of a shared height.
 const shoulderPlacements=JSON.parse(readFileSync(new URL('shoulder-placements.json',import.meta.url),'utf8'));
 const shoulderFor=i=>shoulderPlacements[i];
-const jointCurve='M-16 -12 Q-7 -10 5 -5 Q11 1 5 8 Q-6 10 -15 1Z';
+const jointCurve='M-7 -3 Q-2 -5 4 -2 Q6 1 3 4 Q-3 5 -7 2Z';
 // Keep the hoopoe's covert behind its neck; its wing already overlaps the torso.
 const cuffCurve='M-14 -5 Q-5 -10 5 -4 Q8 1 3 6 Q-5 9 -14 4 Q-17 0 -14 -5Z';
-const jointFor=i=>i===0?'M-11 -7 Q-5 -7 1 -3 Q3 1 0 4 Q-6 5 -11 0Z':jointCurve;
+const jointFor=i=>jointCurve;
 
 export function rigDefs(names){
  let defs=`<image id="bird-body-atlas" width="${bw}" height="${bh}" href="bird-bodies.png"/><image id="bird-wing-atlas" width="${ww}" height="${wh}" href="bird-wings.png"/><clipPath id="hoopoe-shoulder-cover"><path d="M39 44 Q48 39 60 45 Q64 51 59 57 Q47 62 39 54 Q36 49 39 44Z"/></clipPath>`;
