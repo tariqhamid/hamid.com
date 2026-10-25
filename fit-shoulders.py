@@ -1,11 +1,11 @@
 from pathlib import Path
 from PIL import Image
 import numpy as np,json
-p=Path('outputs/hamid.com');a=np.asarray(Image.open(p/'bird-bodies.png').convert('RGBA'));boxes=json.loads((p/'body-bounds.json').read_text())['bird-bodies'];old=json.loads((p/'shoulder-placements.json').read_text());out=[];colors=[]
+p=Path(__file__).resolve().parent;a=np.asarray(Image.open(p/'bird-bodies.png').convert('RGBA'));boxes=json.loads((p/'body-bounds.json').read_text())['bird-bodies'];old=json.loads((p/'shoulder-placements.json').read_text());out=[];colors=[]
 for i,(bx,by,w,h) in enumerate(boxes):
  s=min(100/w,100/h);ox=(100-w*s)/2;oy=(100-h*s)/2
  def pixel(x,y):return a[min(a.shape[0]-1,max(0,round(by+(y-oy)/s))),min(a.shape[1]-1,max(0,round(bx+(x-ox)/s)))]
- ys=[y for y in np.arange(20,82,.5) if pixel(50,y)[3]>220];top=min(ys);bottom=max(ys);target=top+(bottom-top)*.34
+ ys=[y for y in np.arange(20,82,.5) if pixel(50,y)[3]>220];top=min(ys);bottom=max(ys);target=top+(bottom-top)*.18
  choices=[]
  for x in range(46,55):
   for y in np.arange(top+3,bottom-3,.5):
