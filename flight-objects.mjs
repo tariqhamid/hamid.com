@@ -18,7 +18,7 @@ const cuffCurve='M-14 -5 Q-5 -10 5 -4 Q8 1 3 6 Q-5 9 -14 4 Q-17 0 -14 -5Z';
 const jointFor=i=>i===0?'M-11 -7 Q-5 -7 1 -3 Q3 1 0 4 Q-6 5 -11 0Z':jointCurve;
 
 export function rigDefs(names){
- let defs=`<image id="bird-body-atlas" width="${bw}" height="${bh}" href="/bird-bodies.png"/><image id="bird-wing-atlas" width="${ww}" height="${wh}" href="/bird-wings.png"/><clipPath id="hoopoe-shoulder-cover"><path d="M39 44 Q48 39 60 45 Q64 51 59 57 Q47 62 39 54 Q36 49 39 44Z"/></clipPath>`;
+ let defs=`<image id="bird-body-atlas" width="${bw}" height="${bh}" href="bird-bodies.png"/><image id="bird-wing-atlas" width="${ww}" height="${wh}" href="bird-wings.png"/><clipPath id="hoopoe-shoulder-cover"><path d="M39 44 Q48 39 60 45 Q64 51 59 57 Q47 62 39 54 Q36 49 39 44Z"/></clipPath>`;
  names.forEach((_,i)=>{
   const [bx,by,cw,ch]=bodyBounds[i];
   const [sx,sy]=shoulderFor(i);
