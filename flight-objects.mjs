@@ -28,7 +28,7 @@ export function rigDefs(names){
   for(let side=0;side<2;side++){
    const {box:[x,y,w,h],path}=wingBounds[i][side];
    const [rx,ry]=shoulderJoints[i].roots[side];
-   defs+=`<clipPath id="wing-cell-${i}-${side}"><path d="${path}"/></clipPath><g id="wing-object-${i}-${side}" transform="${i===0?'translate(4 4)':'translate(0 0)'}"><svg x="${-rx*wingScale}" y="${-ry*wingScale}" width="${62*wingScale}" height="${82*wingScale}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="none" overflow="hidden"><use href="#bird-wing-atlas" clip-path="url(#wing-cell-${i}-${side})"/></svg></g>`;
+   defs+=`<clipPath id="wing-cell-${i}-${side}"><path d="${path}"/></clipPath><g id="wing-object-${i}-${side}" transform="${i===0?'translate(4 4)':i===3?'translate(3 2)':'translate(0 0)'}"><svg x="${-rx*wingScale}" y="${-ry*wingScale}" width="${62*wingScale}" height="${82*wingScale}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="none" overflow="hidden"><use href="#bird-wing-atlas" clip-path="url(#wing-cell-${i}-${side})"/></svg></g>`;
   }
  });
  return defs;
